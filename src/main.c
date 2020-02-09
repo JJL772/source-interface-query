@@ -3,8 +3,14 @@
  * main.c - Valve Interface Query
  *
  */
+#ifdef _UNIX 
 #include <pthread.h>
 #include <dlfcn.h>
+#include <unistd.h>
+#else
+#include <windows.h>
+#endif 
+
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -30,12 +36,14 @@ int main(int argc, char** argv)
 	{
 		char* arg = argv[i];
 		
-		/* Check for -l */
-		if(strncmp(arg, "-l", 2) == 0)
+		/* Check for -c */
+		if(strncmp(arg, "-c", 2) == 0)
 		{
 			if(i < argc-1)
 			{
-				add_to_ld_path(argv[++i]);
+				chdir(argv[++i]);
+				printf("Changed dir to %s\n", argv[i]);
+				add_to_ld_path(argv[i]);
 			}
 			else
 				usage();
@@ -100,6 +108,7 @@ void usage()
 	printf("\n\nOptions:\n");
 	printf("\t-i <interface>    - Specifies the interface\n");
 	printf("\t-l <path>         - Adds a path to your LD_LIBRARY_PATH\n");
+	printf("\t--extra-lib-dir=* - Same as -l\n");
 	exit(0);
 }
 
