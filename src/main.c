@@ -99,6 +99,7 @@ void usage()
 	printf("USAGE: valve-interface-query -i interface mybinary.so");
 	printf("\n\nOptions:\n");
 	printf("\t-i <interface>    - Specifies the interface\n");
+	printf("\t-l <path>         - Adds a path to your LD_LIBRARY_PATH\n");
 	exit(0);
 }
 
