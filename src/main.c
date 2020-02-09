@@ -50,6 +50,12 @@ int main(int argc, char** argv)
 			continue;
 		}
 
+		/* Check for help */
+		if(strncmp(arg, "-h", 2) == 0 || strncmp(arg, "--help", 6) == 0)
+		{
+			usage();
+		}
+
 		/* Check for -i */
 		if(strncmp(arg, "-i", 2) == 0)
 		{
