@@ -19,6 +19,11 @@
 void usage();
 void add_to_ld_path(const char* entry);
 
+/* Platform abstracted funcs */
+void* Plat_LoadLibrary(const char* lib);
+void* Plat_FindSymbol(void* lib, const char* sym);
+const char* Plat_LastError();
+
 typedef void*(*pfnCreateInterface_t)(const char*,int*);
 
 const char* pextra_dirs[32];
@@ -79,24 +84,26 @@ int main(int argc, char** argv)
 	if(!pdll) usage();
 	if(!pinterface) usage();
 
+#ifndef _WIN32 
 	/* Print out the LD_LIBRARY_PATH */
 	const char* ldpath = getenv("LD_LIBRARY_PATH");
 	printf("LD_LIBRARY_PATH=%s\n", ldpath ? ldpath : "");
+#endif 
 
 	/* Load the shared object */
-	void* module = dlopen(pdll, RTLD_LAZY);
+	void* module = Plat_LoadLibrary(pdll);
 
 	if(!module)
 	{
-		printf("Failed to load module.\nError message: %s\n", dlerror());
+		printf("Failed to load module.\nError message: %s\n", Plat_LastError());
 		exit(1);
 	}
 
-	pfnCreateInterface_t pfnCreateInterface = dlsym(module, "CreateInterface");
+	pfnCreateInterface_t pfnCreateInterface = Plat_FindSymbol(module, "CreateInterface");
 
 	if(!pfnCreateInterface)
 	{
-		printf("Failed to lookup pfnCreateInterface.\nError message: %s\n", dlerror());
+		printf("Failed to lookup pfnCreateInterface.\nError message: %s\n", Plat_LastError());
 		exit(1);
 	}
 
@@ -120,6 +127,9 @@ void usage()
 
 void add_to_ld_path(const char* entry)
 {
+#ifdef _WIN32
+	return; /* Only applicable to win32 applications */
+#else 
 	char* tmpstring;
 	size_t length;
 	const char* pLDPath = getenv("LD_LIBRARY_PATH");
@@ -136,5 +146,34 @@ void add_to_ld_path(const char* entry)
 	}
 	else
 		setenv("LD_LIBRARY_PATH", entry, 1);
+#endif 
+}
 
+void* Plat_LoadLibrary(const char* lib)
+{
+#ifdef _WIN32 
+	return LoadLibraryA(lib);
+#else
+	return dlopen(lib, RTLD_LAZY);
+#endif 
+}
+
+void* Plat_FindSymbol(void* lib, const char* sym)
+{
+#ifdef _WIN32 
+	return GetProcAddress(lib, sym);
+#else 
+	return dlsym(lib, sym);
+#endif
+}
+
+const char* Plat_LastError()
+{
+#ifdef _WIN32
+	static char buf[1024];
+	snprintf(buf, 1024, "Error code %u", GetLastError());
+	return buf;
+#else
+	return dlerror();
+#endif 
 }

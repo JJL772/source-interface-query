@@ -1,0 +1,29 @@
+
+SRC=$(wildcard src/*.c)
+
+CC=x86_64-w64-mingw32-gcc
+CC32=i686-w64-mingw32-gcc 
+LIBS= 
+FLAGS=-m32 -DWIN32 -D_WIN32 -D_WINDOWS 
+FLAGS64=-m64 -D_WIN32 -DWIN32 -D_WIN64 -DWIN64 -D_WINDOWS 
+INSTALL_PREFIX ?= /usr/local/
+
+all: dirs 
+	$(CC32) -o bin/valve-interface-query.exe $(SRC) $(FLAGS) $(LIBS)
+	$(CC) -o bin/valve-interface-query64.exe $(SRC) $(FLAGS64) $(LIBS)
+
+clean:
+	rm -rf bin
+
+dirs:
+	mkdir -p bin 
+
+ifeq ($(INSTALL_PREFIX),)
+	$(error You must specify an install prefix!)
+endif 
+
+install: all 
+	/bin/cp bin/valve-interface-query.exe $(INSTALL_PREFIX)/bin/source-interface-query.exe 
+	/bin/cp bin/valve-interface-query64.exe $(INSTALL_PREFIX)/bin/source-interface-query64.exe 
+	chmod +rwx $(INSTALL_PREFIX)/bin/source-interface-query.exe
+	chmod +rwx $(INSTALL_PREFIX)/bin/source-interface-query64.exe
