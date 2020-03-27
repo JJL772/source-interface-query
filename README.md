@@ -1,6 +1,8 @@
 ## source-interface-query
 
-This is a small command-line utility that lets you grab exposed interfaces from Source Engine games. Currently only Linux is supported.
+This is a small command-line utility that lets you grab exposed interfaces from Source Engine games. 
+
+This has been tested with both Source 1 and Source 2. Currently the Windows version is cross compiled using Mingw, so some bugs might be present if you use this on Windows, however, it seems to work great with wine.
 
 ### Building
  
