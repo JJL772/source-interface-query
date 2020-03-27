@@ -112,7 +112,7 @@ int main(int argc, char** argv)
 
 	printf("CreateInterface returned: pointer 0x%LX, status=%s\n", (unsigned long long)res, ret ? "IFACE_FAILED" : "IFACE_OK");
 
-	return 0;
+	return ret;
 }
 
 void usage()
