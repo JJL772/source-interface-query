@@ -9,8 +9,8 @@ FLAGS64=-m64 -D_WIN32 -DWIN32 -D_WIN64 -DWIN64 -D_WINDOWS
 INSTALL_PREFIX ?= /usr/local/
 
 all: dirs 
-	$(CC32) -o bin/valve-interface-query.exe $(SRC) $(FLAGS) $(LIBS)
-	$(CC) -o bin/valve-interface-query64.exe $(SRC) $(FLAGS64) $(LIBS)
+	$(CC32) -o bin/source-interface-query.exe $(SRC) $(FLAGS) $(LIBS)
+	$(CC) -o bin/source-interface-query64.exe $(SRC) $(FLAGS64) $(LIBS)
 
 clean:
 	rm -rf bin
@@ -23,7 +23,7 @@ ifeq ($(INSTALL_PREFIX),)
 endif 
 
 install: all 
-	/bin/cp bin/valve-interface-query.exe $(INSTALL_PREFIX)/bin/source-interface-query.exe 
-	/bin/cp bin/valve-interface-query64.exe $(INSTALL_PREFIX)/bin/source-interface-query64.exe 
+	/bin/cp bin/source-interface-query.exe $(INSTALL_PREFIX)/bin/source-interface-query.exe 
+	/bin/cp bin/source-interface-query64.exe $(INSTALL_PREFIX)/bin/source-interface-query64.exe 
 	chmod +rwx $(INSTALL_PREFIX)/bin/source-interface-query.exe
 	chmod +rwx $(INSTALL_PREFIX)/bin/source-interface-query64.exe
