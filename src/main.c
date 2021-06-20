@@ -17,7 +17,6 @@
 #include <stdlib.h>
 
 void usage();
-void add_to_ld_path(const char* entry);
 
 /* Platform abstracted funcs */
 void* Plat_LoadLibrary(const char* lib);
@@ -48,7 +47,6 @@ int main(int argc, char** argv)
 			{
 				chdir(argv[++i]);
 				printf("Changed dir to %s\n", argv[i]);
-				add_to_ld_path(argv[i]);
 			}
 			else
 				usage();
@@ -110,7 +108,7 @@ int main(int argc, char** argv)
 	int ret = 0;
 	void* res = pfnCreateInterface(pinterface, &ret);
 
-	printf("CreateInterface returned: pointer 0x%LX, status=%s\n", (unsigned long long)res, ret ? "IFACE_FAILED" : "IFACE_OK");
+	printf("CreateInterface returned: pointer 0x%LX, status=%s\n", (uintptr_t)res, ret ? "IFACE_FAILED" : "IFACE_OK");
 
 	return ret;
 }
@@ -120,33 +118,7 @@ void usage()
 	printf("USAGE: valve-interface-query -i interface mybinary.so");
 	printf("\n\nOptions:\n");
 	printf("\t-i <interface>    - Specifies the interface\n");
-	printf("\t-l <path>         - Adds a path to your LD_LIBRARY_PATH\n");
-	printf("\t--extra-lib-dir=* - Same as -l\n");
 	exit(0);
-}
-
-void add_to_ld_path(const char* entry)
-{
-#ifdef _WIN32
-	return; /* Only applicable to win32 applications */
-#else 
-	char* tmpstring;
-	size_t length;
-	const char* pLDPath = getenv("LD_LIBRARY_PATH");
-
-	if(pLDPath)
-	{
-		length = strlen(pLDPath) + strlen(entry) + 5;
-		tmpstring = malloc(length);
-
-		/* Print in the new LD path */
-		snprintf(tmpstring, length, "%s:%s", entry, pLDPath);
-		setenv("LD_LIBRARY_PATH", tmpstring, 1);
-		free(tmpstring);
-	}
-	else
-		setenv("LD_LIBRARY_PATH", entry, 1);
-#endif 
 }
 
 void* Plat_LoadLibrary(const char* lib)
@@ -154,7 +126,20 @@ void* Plat_LoadLibrary(const char* lib)
 #ifdef _WIN32 
 	return LoadLibraryA(lib);
 #else
-	return dlopen(lib, RTLD_LAZY);
+	char realPath[1024];
+	*realPath = 0;
+	// Make absolute if not already
+	if(*lib != '/') 
+	{
+		getcwd(realPath, sizeof(realPath));
+		strncat(realPath, "/", sizeof(realPath)-1);
+		strncat(realPath, lib, sizeof(realPath)-1);
+	}
+	else
+	{
+		strncpy(realPath, lib, sizeof(realPath));
+	}
+	return dlopen(realPath, RTLD_LAZY);
 #endif 
 }
 

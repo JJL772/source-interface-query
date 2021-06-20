@@ -7,8 +7,8 @@ FLAGS64=-m64 -D_UNIX -DLINUX -D_LINUX -DUNIX
 INSTALL_PREFIX ?= /usr/local/
 
 all: dirs 
-	$(CC) -o bin/valve-interface-query $(SRC) $(FLAGS) $(LIBS)
-	$(CC) -o bin/valve-interface-query64 $(SRC) $(FLAGS64) $(LIBS)
+	$(CC) -o bin/source-interface-query $(SRC) $(FLAGS) $(LIBS)
+	$(CC) -o bin/source-interface-query64 $(SRC) $(FLAGS64) $(LIBS)
 
 clean:
 	rm -rf bin
@@ -21,9 +21,7 @@ ifeq ($(INSTALL_PREFIX),)
 endif 
 
 install: all 
-	/bin/cp src/wrapper.sh $(INSTALL_PREFIX)/bin/source-interface-query
-	/bin/cp src/wrapper64.sh $(INSTALL_PREFIX)/bin/source-interface-query64
+	/bin/cp bin/source-interface-query $(INSTALL_PREFIX)/bin/source-interface-query
+	/bin/cp bin/source-interface-query64 $(INSTALL_PREFIX)/bin/source-interface-query64 
 	chmod +rwx $(INSTALL_PREFIX)/bin/source-interface-query
 	chmod +rwx $(INSTALL_PREFIX)/bin/source-interface-query64
-	/bin/cp bin/valve-interface-query $(INSTALL_PREFIX)/bin/valve-interface-query
-	/bin/cp bin/valve-interface-query64 $(INSTALL_PREFIX)/bin/valve-interface-query64 
